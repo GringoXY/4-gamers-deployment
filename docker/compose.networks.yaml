@@ -1,0 +1,12 @@
+networks:
+  internet-access:
+    driver: bridge
+  backend:
+    internal: true
+    driver: bridge
+  db-access:
+    internal: true
+    driver: bridge
+  mailing:
+    internal: true
+    driver: bridge

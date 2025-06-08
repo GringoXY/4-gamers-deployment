@@ -1,0 +1,98 @@
+services:
+  api:
+    build: 
+      context: https://github.com/GringoXY/4-gamers-api.git
+      secrets:
+        - GIT_AUTH_TOKEN
+    image: 4gamers/api:dev
+    hostname: api
+    container_name: api
+    restart: unless-stopped
+    ports:
+      - 5000:5000
+    expose:
+      - 5000
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - "./logs:/app/logs:ro"
+    networks:
+      - backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ASPNETCORE_HTTP_PORTS=5000
+      - FORGAMERS__Jwt__Key=${API_Jwt_Key}
+      - FORGAMERS__PostgreSQL__Password=${API_PostgreSQL_Password}
+      - FORGAMERS__Hasher__Salt=${API_Hasher_Salt}
+      - FORGAMERS__Tokenizer__Key=${API_Tokenizer_Key}
+      - FORGAMERS__BackgroundServices__OutboxMessagesProcess__RabbitMQ__HostName=${API_OutboxMessagesProcess_RabbitMQ_HostName}
+      - FORGAMERS__BackgroundServices__OutboxMessagesProcess__RabbitMQ__Password=${API_OutboxMessagesProcess_RabbitMQ_Password}
+    healthcheck:
+      test: ["CMD", "dotnet", "--info"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  mailing:
+    build:
+      context: https://github.com/GringoXY/4-gamers-mailing.git
+      secrets:
+        - GIT_AUTH_TOKEN
+    image: 4gamers/mailing:dev
+    hostname: mailing
+    container_name: mailing
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - internet-access
+      - backend
+      - mailing
+      - db-access
+    environment:
+      - ASPNETCORE_CULTURE=en-US
+      - ASPNETCORE_ENVIRONMENT=Development
+      - FORGAMERS__PostgreSQL__Host=${MAILING_PostgreSQL_Host}
+      - FORGAMERS__PostgreSQL__Password=${MAILING_PostgreSQL_Password}
+      - FORGAMERS__BackgroundServices__OutboxMessagesConsumer__RabbitMQ__HostName=${MAILING_OutboxMessagesConsumer_RabbitMQ_HostName}
+      - FORGAMERS__BackgroundServices__OutboxMessagesConsumer__RabbitMQ__Password=${MAILING_OutboxMessagesConsumer_RabbitMQ_Password}
+      - FORGAMERS__BackgroundServices__SendEmail__Smtp__Password=${MAILING_SendEmail_Smtp_Password}
+    healthcheck:
+      test: ["CMD", "dotnet", "--info"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  docs:
+    build:
+      context: https://github.com/GringoXY/4-gamers-docs.git
+      secrets:
+        - GIT_AUTH_TOKEN
+    image: 4gamers/docs:dev
+    hostname: docs
+    container_name: docs
+    ports:
+      - 5287:5287
+    restart: unless-stopped
+    networks:
+      - mailing
+    environment:
+      - ASPNETCORE_CULTURE=en-US
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5287
+      - ASPNETCORE_HTTP_PORTS=5287
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5287/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s

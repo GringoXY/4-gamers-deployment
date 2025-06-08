@@ -1,0 +1,9 @@
+# 4-Gamers Docker Compose Entrypoint
+include:
+  - docker/compose.networks.yaml
+  - docker/compose.volumes.yaml
+  - docker/compose.secrets.yaml
+  - docker/compose.databases.yaml
+  - docker/compose.brokers.yaml
+  - docker/compose.backend.yaml
+  - docker/compose.frontend.yaml

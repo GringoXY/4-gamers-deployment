@@ -1,0 +1,23 @@
+services:
+  ui:
+    build: 
+      context: https://github.com/GringoXY/4-gamers-ui.git
+      secrets:
+        - GIT_AUTH_TOKEN
+    image: 4gamers/ui:dev
+    hostname: ui
+    container_name: ui
+    restart: unless-stopped
+    ports:
+      - 4000:4000
+    expose:
+      - 4000
+    networks:
+      - internet-access
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
