@@ -52,19 +52,21 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      docs:
+        condition: service_healthy
     networks:
       - internet-access
       - backend
       - mailing
       - db-access
+    volumes:
+      - "./Mailing/appsettings:/app/appsettings"
     environment:
-      - ASPNETCORE_CULTURE=en-US
-      - ASPNETCORE_ENVIRONMENT=Development
-      - FORGAMERS__PostgreSQL__Host=${MAILING_PostgreSQL_Host}
+      - DOTNET_CULTURE=en-US
+      - DOTNET_ENVIRONMENT=Development
       - FORGAMERS__PostgreSQL__Password=${MAILING_PostgreSQL_Password}
-      - FORGAMERS__BackgroundServices__OutboxMessagesConsumer__RabbitMQ__HostName=${MAILING_OutboxMessagesConsumer_RabbitMQ_HostName}
       - FORGAMERS__BackgroundServices__OutboxMessagesConsumer__RabbitMQ__Password=${MAILING_OutboxMessagesConsumer_RabbitMQ_Password}
-      - FORGAMERS__BackgroundServices__SendEmail__Smtp__Password=${MAILING_SendEmail_Smtp_Password}
+      - FORGAMERS__BackgroundServices__SendEmailInboxMessages__Smtp__Password=${MAILING_SendEmailInboxMessages_Smtp_Password}
     healthcheck:
       test: ["CMD", "dotnet", "--info"]
       interval: 30s
@@ -92,7 +94,7 @@ services:
       - ASPNETCORE_HTTP_PORTS=5287
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5287/health"]
-      interval: 30s
+      interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      start_period: 10s

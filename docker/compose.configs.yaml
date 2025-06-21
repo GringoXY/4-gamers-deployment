@@ -1,8 +1,12 @@
 services:
+  mailing:
+    volumes:
+      - "./Mailing/appsettings:/app/appsettings"
+
   api:
     volumes:
-      - "./src/4Gamers.API/appsettings:/app/appsettings"
+      - "./API/appsettings:/app/appsettings"
 
   ui:
     volumes:
-      - "./public/assets/config.json:/app/dist/browser/assets/config.json"
+      - "./UI/assets/config.json:/app/dist/browser/assets/config.json"
