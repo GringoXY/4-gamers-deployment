@@ -14,6 +14,7 @@ services:
     networks:
       - backend
       - db-access
+      - internet-access
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s

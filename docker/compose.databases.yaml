@@ -11,6 +11,7 @@ services:
     networks:
       - backend
       - db-access
+      - internet-access
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}

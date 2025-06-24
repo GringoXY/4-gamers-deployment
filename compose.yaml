@@ -7,4 +7,3 @@ include:
   - docker/compose.brokers.yaml
   - docker/compose.backend.yaml
   - docker/compose.frontend.yaml
-  - docker/compose.configs.yaml
